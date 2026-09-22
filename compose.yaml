@@ -1,0 +1,15 @@
+services:
+  neon-rift:
+    build: .
+    container_name: neon-rift
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:4174:4174"
+    volumes:
+      - ./data:/app/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL

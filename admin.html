@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#070b18">
+  <title>星环控制台 // 内容管理</title>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <main class="admin-shell" id="adminShell">
+    <aside class="admin-nav">
+      <a class="admin-brand" href="/"><span>SR</span><div><b>星环控制台</b><small>ORBIT ADMIN</small></div></a>
+      <nav>
+        <button class="active" data-view="overview" type="button"><i>01</i><span>总览</span></button>
+        <button data-view="reviews" type="button"><i>02</i><span>关卡审核</span><em id="reviewBadge">0</em></button>
+        <button data-view="users" type="button"><i>03</i><span>创作者</span></button>
+        <button data-view="announcements" type="button"><i>04</i><span>公告</span></button>
+        <button data-view="levels" type="button"><i>05</i><span>公开星图</span></button>
+      </nav>
+      <div class="admin-user"><span>ADMIN</span><b id="adminName">未登录</b><button id="logoutBtn" type="button">退出</button></div>
+    </aside>
+
+    <section class="admin-main">
+      <header class="admin-header"><div><span>CONTENT OPERATIONS</span><h1 id="viewTitle">运营总览</h1></div><div><time id="serverTime"></time><button id="refreshBtn" type="button" title="刷新" aria-label="刷新">↻</button></div></header>
+
+      <section class="admin-view active" data-panel="overview">
+        <div class="stat-grid">
+          <article><span>PENDING REVIEW</span><strong id="statPending">0</strong><small>待试玩关卡</small></article>
+          <article><span>CREATORS</span><strong id="statCreators">0</strong><small>创作者账号</small></article>
+          <article><span>PUBLIC LEVELS</span><strong id="statLevels">0</strong><small>公开星图关卡</small></article>
+          <article><span>ANNOUNCEMENTS</span><strong id="statAnnouncements">0</strong><small>当前公告</small></article>
+        </div>
+        <section class="ops-panel"><div class="panel-head"><div><span>REVIEW QUEUE</span><h2>最近审核申请</h2></div><button type="button" data-jump="reviews">查看全部</button></div><div class="compact-list" id="recentReviews"></div></section>
+      </section>
+
+      <section class="admin-view" data-panel="reviews">
+        <div class="filter-bar"><button class="active" data-review-filter="pending" type="button">待审核</button><button data-review-filter="approved" type="button">已通过</button><button data-review-filter="rejected" type="button">已拒绝</button><button data-review-filter="all" type="button">全部</button></div>
+        <div class="review-grid" id="reviewGrid"></div>
+      </section>
+
+      <section class="admin-view" data-panel="users">
+        <section class="ops-panel creator-form"><div class="panel-head"><div><span>CREATOR ACCESS</span><h2>开通创作者账号</h2></div></div><form id="createUserForm"><label><span>登录账号</span><input id="newAccount" type="text" minlength="4" maxlength="32" placeholder="creator_name" required></label><label><span>显示名称</span><input id="newDisplayName" type="text" minlength="2" maxlength="20" placeholder="创作者昵称" required></label><label><span>初始密码</span><input id="newPassword" type="password" minlength="8" placeholder="至少 8 位" required></label><button class="primary" type="submit">创建账号</button></form></section>
+        <section class="ops-panel"><div class="panel-head"><div><span>ACCOUNT DIRECTORY</span><h2>创作者管理</h2></div></div><div class="data-table" id="userTable"></div></section>
+      </section>
+
+      <section class="admin-view" data-panel="announcements">
+        <section class="ops-panel announcement-form"><div class="panel-head"><div><span>BROADCAST CENTER</span><h2>发布游戏公告</h2></div></div><form id="announcementForm"><label><span>公告标题</span><input id="announcementTitle" type="text" maxlength="60" required></label><label><span>公告内容</span><textarea id="announcementBody" rows="5" maxlength="500" required></textarea></label><button class="primary" type="submit">发布到游戏邮箱</button></form></section>
+        <section class="ops-panel"><div class="panel-head"><div><span>MESSAGE ARCHIVE</span><h2>已发布公告</h2></div></div><div class="announcement-list" id="announcementList"></div></section>
+      </section>
+
+      <section class="admin-view" data-panel="levels">
+        <section class="ops-panel"><div class="panel-head"><div><span>PUBLIC STAR CHART</span><h2>公开关卡管理</h2></div></div><div class="level-table" id="levelTable"></div></section>
+      </section>
+    </section>
+  </main>
+
+  <section class="admin-login" id="adminLogin">
+    <form id="adminLoginForm">
+      <span>ORBIT ADMIN / SECURE GATE</span><h1>管理端验证</h1><p>登录后可试玩审核关卡、管理创作者账号和发布游戏公告。</p>
+      <label><span>管理员账号</span><input id="adminAccount" type="text" autocomplete="username" required></label>
+      <label><span>密码</span><input id="adminPassword" type="password" autocomplete="current-password" required></label>
+      <p class="login-error hidden" id="loginError"></p><button class="primary" type="submit">进入控制台</button>
+    </form>
+  </section>
+
+  <div class="admin-toast hidden" id="adminToast"></div>
+  <script src="admin.js"></script>
+</body>
+</html>

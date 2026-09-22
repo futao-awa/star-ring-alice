@@ -1,0 +1,17 @@
+.git
+.gitignore
+.env
+data
+deploy
+*.log
+*.tmp
+rankings.json
+levels.json
+shares.json
+users.json
+reviews.json
+announcements.json
+mail.json
+DEPLOYMENT.md
+README.md
+THIRD_PARTY_ASSETS.md

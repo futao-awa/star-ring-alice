@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#050816">
+  <title>星环工坊 // 自制关卡</title>
+  <link rel="stylesheet" href="play.css">
+</head>
+<body>
+  <main class="player-shell" id="playerShell">
+    <header class="player-header"><a id="headerBackLink" href="/editor.html" aria-label="返回工坊">←</a><div><span>COMMUNITY MISSION</span><b id="headerTitle">读取星球资料</b></div><em id="authorLabel">ORBIT LAB</em></header>
+    <section class="mission-brief" id="missionBrief">
+      <div class="planet-visual" id="planetVisual"><i></i><b></b></div>
+      <div class="brief-copy"><span id="threatLabel">DANGER // 01</span><h1 id="planetTitle">正在建立星门连接</h1><p id="planetDescription">正在读取关卡资料...</p><dl><div><dt>守卫</dt><dd id="bossLabel">UNKNOWN</dd></div><div><dt>技能组合</dt><dd id="skillLabel">--</dd></div><div><dt>调试权限</dt><dd id="cheatLabel">--</dd></div></dl><button id="beginBtn" type="button" disabled>▶ 开始任务</button></div>
+    </section>
+    <section class="dialogue-layer hidden" id="dialogueLayer"><div class="dialogue-art"></div><button id="dialogueBox" type="button"><span id="dialogueSpeaker">SYSTEM</span><p id="dialogueText"></p><i>▼</i></button></section>
+    <section class="battle-layer hidden" id="battleLayer">
+      <canvas id="battleCanvas" width="720" height="720" aria-label="自定义弹幕关卡"></canvas>
+      <div class="battle-help"><span>WASD / 方向键移动</span><span>Z / K / 空格射击</span><span>SHIFT 低速</span></div>
+      <button class="cheat-btn hidden" id="cheatBtn" type="button">调试无敌：关</button>
+    </section>
+    <section class="result-layer hidden" id="resultLayer"><span id="resultKicker">MISSION COMPLETE</span><h2 id="resultTitle">星门已恢复</h2><p id="resultQuote"></p><div><button id="retryBtn" type="button">再次挑战</button><a id="resultBackLink" href="/editor.html">返回工坊</a></div></section>
+    <section class="error-panel hidden" id="errorPanel"><span>LINK ERROR</span><h2>关卡无法载入</h2><p id="errorText">这个临时链接可能已经失效。</p><a id="errorBackLink" href="/editor.html">返回星环工坊</a></section>
+  </main>
+  <script src="music-engine.js"></script>
+  <script src="barrage-engine.js"></script>
+  <script src="player.js"></script>
+</body>
+</html>

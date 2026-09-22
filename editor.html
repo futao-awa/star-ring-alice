@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#050816">
+  <title>星环工坊 // 多轨弹幕编辑器</title>
+  <link rel="stylesheet" href="editor.css">
+</head>
+<body>
+  <main class="studio-shell" id="studioShell">
+    <header class="studio-header">
+      <a class="icon-btn back-link" href="/" aria-label="返回游戏" title="返回游戏">←</a>
+      <div class="studio-brand"><span>ORBIT LAB / MULTI-TRACK</span><b>星环工坊</b></div>
+      <div class="header-status"><i></i><span id="saveState">等待创作者验证</span></div>
+      <div class="creator-chip"><span>CREATOR</span><b id="creatorName">未验证</b></div>
+      <div class="header-actions">
+        <button class="icon-btn" id="mailBtn" type="button" title="创作者邮箱" aria-label="创作者邮箱">✉<i id="mailDot"></i></button>
+        <a class="header-legal-link" href="/privacy.html#workshop" target="_blank" rel="noopener">协议</a>
+        <button id="importBtn" type="button">导入</button>
+        <button id="exportBtn" type="button">导出</button>
+        <button class="accent" id="testBtn" type="button">▶ 试玩</button>
+        <button class="logout-action" id="creatorLogoutBtn" type="button">退出</button>
+      </div>
+    </header>
+
+    <section class="studio-workspace">
+      <aside class="pattern-library">
+        <div class="panel-title"><span>ASSET LIBRARY</span><b>弹幕资产</b></div>
+        <label class="search-field"><span>⌕</span><input id="patternSearch" type="search" placeholder="搜索机制"></label>
+        <button class="create-emitter" id="createEmitter" type="button"><span>＋</span><div><b>新建自由发射器</b><small>从空白参数与自绘轨迹开始</small></div></button>
+        <div class="pattern-list" id="patternList"></div>
+        <div class="library-note"><b>可叠加运行</b><p>同一时间内跨轨道重叠的片段会同时播放。拖动片段调整时间与轨道，拖动右侧边缘改变长度。</p></div>
+      </aside>
+
+      <section class="preview-stage">
+        <div class="preview-toolbar">
+          <div><span>LIVE COMPOSITOR</span><b id="previewTitle">未命名星球</b></div>
+          <div class="transport-readout"><b id="timeReadout">00:00.0</b><span id="phaseReadout">PHASE 01</span></div>
+          <div class="preview-controls">
+            <button id="restartPreview" type="button" title="回到阶段开头" aria-label="回到阶段开头">↺</button>
+            <button id="pausePreview" type="button" title="暂停预览" aria-label="暂停预览">Ⅱ</button>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="previewCanvas" width="720" height="720" aria-label="弹幕实时合成预览"></canvas>
+          <div class="preview-badge"><span>NOW PLAYING</span><b id="activePatternName">安全窗口</b></div>
+          <div class="preview-guide"><span>多轨实时合成</span><i></i><span>阶段循环预览</span></div>
+        </div>
+      </section>
+
+      <aside class="inspector">
+        <div class="inspector-tabs" role="tablist">
+          <button class="active" type="button" data-tab="clip">片段</button>
+          <button type="button" data-tab="phase">阶段</button>
+          <button type="button" data-tab="project">关卡</button>
+          <button type="button" data-tab="story">剧情</button>
+          <button type="button" data-tab="publish">发布</button>
+        </div>
+
+        <section class="inspector-panel active" data-panel="clip">
+          <div class="panel-title"><span>EMITTER PROPERTIES</span><b>片段参数</b></div>
+          <div class="empty-selection" id="clipEmpty">选择时间轴片段后可精确调整弹幕。</div>
+          <div id="clipFields">
+            <label><span>片段名称</span><input id="clipName" type="text" maxlength="28"></label>
+            <div class="field-grid"><label><span>开始 / 秒</span><input id="clipStart" type="number" min="0" max="120" step="0.1"></label><label><span>长度 / 秒</span><input id="clipDuration" type="number" min="0.5" max="120" step="0.1"></label></div>
+            <div class="field-grid"><label><span>发射 X / %</span><input id="paramX" type="number" min="0" max="100"></label><label><span>发射 Y / %</span><input id="paramY" type="number" min="0" max="100"></label></div>
+            <div class="field-grid"><label><span>角度</span><input id="paramAngle" type="number" min="-360" max="360"></label><label><span>尺寸</span><input id="paramSize" type="number" min="2" max="24" step="1"></label></div>
+            <div class="field-grid"><label><span>弹速</span><input id="paramSpeed" type="number" min="20" max="420" step="5"></label><label><span>数量</span><input id="paramCount" type="number" min="1" max="80"></label></div>
+            <div class="field-grid"><label><span>扩散角</span><input id="paramSpread" type="number" min="0" max="360"></label><label><span>间隔 / 秒</span><input id="paramRate" type="number" min="0.08" max="8" step="0.05"></label></div>
+            <div class="field-grid"><label><span>弹体形状</span><select id="paramShape"><option value="orb">光弹</option><option value="diamond">菱晶</option><option value="shard">长针</option><option value="star">星芒</option><option value="ring">空心环</option></select></label><label><span>颜色</span><input id="paramColor" type="color"></label></div>
+            <div class="field-grid"><label><span>构型</span><select id="paramFormation"><option value="radial">圆周</option><option value="fan">扇形</option><option value="line">直线阵列</option><option value="polygon">多边形</option><option value="path">沿路径排布</option></select></label><label><span>运动</span><select id="paramMotion"><option value="straight">直线</option><option value="curve-left">左旋</option><option value="curve-right">右旋</option><option value="wave">波浪</option><option value="homing">追踪</option><option value="bounce">反弹</option><option value="orbit">环绕后释放</option><option value="stop-go">暂停再启动</option></select></label></div>
+            <div class="field-grid"><label><span>多边形边数</span><input id="paramSides" type="number" min="3" max="12"></label><label class="check-line"><input id="paramAim" type="checkbox"><span>锁定玩家方向</span></label></div>
+            <div class="path-editor"><div><span>EMITTER PATH</span><b>自绘发射轨迹</b><button id="clearPath" type="button">清空</button></div><canvas id="pathCanvas" width="600" height="260" aria-label="绘制发射器运动路径"></canvas><small>按住并拖动画出发射器路径，节点会按片段时长依次播放。</small></div>
+            <button class="danger wide" id="deleteClip" type="button">删除当前片段</button>
+          </div>
+        </section>
+
+        <section class="inspector-panel" data-panel="phase">
+          <div class="panel-title"><span>BOSS PHASE</span><b>阶段编排</b></div>
+          <label><span>阶段名称</span><input id="phaseName" type="text" maxlength="30"></label>
+          <div class="field-grid"><label><span>阶段血量</span><input id="phaseHp" type="number" min="1000" max="500000" step="500"></label><label><span>循环时长 / 秒</span><input id="phaseDuration" type="number" min="6" max="120" step="1"></label></div>
+          <label><span>阶段转场</span><select id="phaseTransition"><option value="scan">扫描环</option><option value="break">核心碎裂</option><option value="warp">空间折跃</option><option value="rewind">时间回溯</option><option value="blackout">熄灯切换</option></select></label>
+          <div class="phase-actions"><button class="secondary" id="duplicatePhase" type="button">复制阶段</button><button class="danger" id="deletePhase" type="button">删除阶段</button></div>
+          <div class="phase-summary" id="phaseSummary"></div>
+        </section>
+
+        <section class="inspector-panel" data-panel="project">
+          <div class="panel-title"><span>WORLD PROFILE</span><b>关卡与 Boss</b></div>
+          <label><span>星球名称</span><input id="planetName" type="text" maxlength="24"></label>
+          <label><span>关卡简介</span><textarea id="description" maxlength="240" rows="4"></textarea></label>
+          <div class="field-grid"><label><span>危险等级</span><input id="difficulty" type="number" min="1" max="10"></label><label><span>主题色</span><input id="accent" type="color"></label></div>
+          <div class="music-editor">
+            <div><span>BATTLE MUSIC</span><b>关卡背景音乐</b></div>
+            <label><span>内置曲风</span><select id="musicTrack">
+              <option value="starlight-idle">星光待机 · 轻灵动漫</option>
+              <option value="anime-flight">晴空航线 · 明快动漫</option>
+              <option value="pixel-rush">像素疾驰 · 8BIT节奏</option>
+              <option value="neon-beat">霓虹脉冲 · 强拍电音</option>
+              <option value="heroic-orbit">星环决战 · 热血交响</option>
+              <option value="chrono-abyss">时渊回响 · 暗色时间系</option>
+            </select></label>
+            <label class="asset-drop compact" for="musicFile"><input id="musicFile" type="file" accept="audio/ogg,audio/mpeg,audio/wav,audio/webm"><span>上传自定义音乐</span><b>OGG / MP3 / WAV / WEBM · 最大 1.6MB</b><small id="musicFileState">当前使用内置曲风</small></label>
+            <div class="music-actions"><button class="secondary" id="musicPreview" type="button">▶ 试听</button><button class="secondary" id="clearMusic" type="button">恢复内置</button></div>
+          </div>
+          <label><span>守卫名称</span><input id="bossName" type="text" maxlength="30"></label>
+          <label class="asset-drop" for="bossImage"><input id="bossImage" type="file" accept="image/png,image/jpeg,image/webp"><span>上传 Boss 贴图</span><b>PNG / JPG / WEBP · 最大 1.2MB</b><small id="bossImageState">使用默认机械守卫模型</small></label>
+          <button class="secondary wide" id="clearBossImage" type="button">恢复默认守卫</button>
+          <div class="boss-motion-editor">
+            <div><span>BOSS NAVIGATION</span><b>守卫运动轨迹</b></div>
+            <label><span>运动模式</span><select id="bossMotionMode"><option value="hover">悬浮漂移</option><option value="horizontal">水平巡航</option><option value="figure-eight">8 字巡航</option><option value="orbit">椭圆环绕</option><option value="path">自绘轨迹</option></select></label>
+            <div class="field-grid"><label><span>运动速度</span><input id="bossMotionSpeed" type="number" min="0.2" max="3" step="0.1"></label><label><span>水平范围 / %</span><input id="bossMotionRangeX" type="number" min="0" max="42" step="1"></label></div>
+            <label><span>垂直范围 / %</span><input id="bossMotionRangeY" type="number" min="0" max="28" step="1"></label>
+            <div class="boss-path-wrap hidden" id="bossPathWrap"><div><span>CUSTOM ROUTE</span><button id="clearBossPath" type="button">清空</button></div><canvas id="bossPathCanvas" width="600" height="250" aria-label="绘制 Boss 运动轨迹"></canvas><small>按住拖动画出巡航路线。路线会循环播放，安全区域限制在战场上半部。</small></div>
+          </div>
+          <label class="switch-line"><span><b>允许调试作弊</b><small>关闭后试玩页不提供无敌开关</small></span><input id="allowCheat" type="checkbox"><i></i></label>
+        </section>
+
+        <section class="inspector-panel" data-panel="story">
+          <div class="panel-title"><span>DIALOGUE SCRIPT</span><b>剧情与语录</b></div>
+          <p class="field-help">每行格式为“角色 | 台词”，最多 20 段。</p>
+          <textarea class="script-editor" id="dialogue" rows="12"></textarea>
+          <label><span>通关语录</span><input id="clearQuote" type="text" maxlength="100"></label>
+        </section>
+
+        <section class="inspector-panel" data-panel="publish">
+          <div class="panel-title"><span>REVIEW PIPELINE</span><b>审核与部署</b></div>
+          <div class="publish-block review"><b>发布到玩家星图</b><p>提交后进入人工审核。管理员会试玩关卡并决定通过或拒绝，结果投递到创作者邮箱。</p><button class="accent wide" id="publishBtn" type="button">发送审核申请</button></div>
+          <div class="publish-block"><b>创建临时试玩链接</b><p>不会出现在公开星图，可发给朋友测试多轨关卡。</p><div class="share-row"><select id="shareExpiry"><option value="24">24 小时</option><option value="168">7 天</option><option value="720">30 天</option></select><button class="secondary" id="shareBtn" type="button">生成链接</button></div></div>
+          <div class="share-result hidden" id="shareResult"><span id="shareLabel">链接已生成</span><input id="shareUrl" type="text" readonly><button id="copyShare" type="button">复制链接</button></div>
+          <div class="submission-list"><div><b>我的审核单</b><button id="refreshReviews" type="button" title="刷新">↻</button></div><div id="reviewList"><p>正在读取...</p></div></div>
+          <div class="submission-list"><div><b>已公开玩家星图</b><button id="refreshLevels" type="button" title="刷新">↻</button></div><div id="communityList"><p>正在读取...</p></div></div>
+        </section>
+      </aside>
+    </section>
+
+    <section class="timeline-dock">
+      <div class="timeline-toolbar">
+        <div class="phase-strip" id="phaseStrip"></div>
+        <button id="addPhase" type="button">＋ 阶段</button>
+        <button id="addTrack" type="button">＋ 轨道</button>
+        <label>缩放 <input id="timelineZoom" type="range" min="10" max="32" value="18"></label>
+      </div>
+      <div class="timeline-scroll" id="timelineScroll">
+        <div class="timeline-content" id="timelineContent">
+          <div class="timeline-ruler" id="timelineRuler"></div>
+          <div class="playhead" id="playhead"><i></i></div>
+          <div class="timeline-tracks" id="timelineTracks"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section class="auth-gate" id="authGate">
+    <form class="auth-card" id="creatorLogin">
+      <div class="auth-emblem"><i></i><b>OL</b></div>
+      <span>ORBIT LAB / CREATOR ACCESS</span><h1>验证创作者资格</h1>
+      <p>星环工坊仅向已审核的创作者账号开放。你的草稿会保存在本机。</p>
+      <label><span>创作者账号</span><input id="creatorAccount" type="text" autocomplete="username" required></label>
+      <label><span>密码</span><input id="creatorPassword" type="password" autocomplete="current-password" required></label>
+      <label class="creator-consent"><input id="creatorPrivacyConsent" type="checkbox" required><span>我已阅读并同意 <a href="/privacy.html#workshop" target="_blank" rel="noopener">工坊隐私与创作者协议</a>，并确认上传素材拥有合法授权，同时接受 <a href="/privacy.html#disclaimer" target="_blank" rel="noopener">免责声明</a>。</span></label>
+      <p class="auth-error hidden" id="authError"></p>
+      <button class="accent" type="submit">进入工坊</button>
+      <footer>测试版暂不支持注册，请联系开发者申请创作者资格。使用工坊前请完整阅读协议，草稿仍需自行备份。</footer>
+    </form>
+  </section>
+
+  <aside class="mail-drawer hidden" id="mailDrawer">
+    <header><div><span>CREATOR INBOX</span><b>创作者邮箱</b></div><button id="mailClose" type="button" aria-label="关闭">×</button></header>
+    <div id="mailList"><p>正在同步消息...</p></div>
+  </aside>
+
+  <input class="hidden" id="importFile" type="file" accept="application/json">
+  <div class="studio-toast hidden" id="studioToast" role="status"></div>
+  <script src="music-engine.js"></script>
+  <script src="barrage-engine.js"></script>
+  <script src="editor.js"></script>
+</body>
+</html>

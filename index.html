@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#050816">
+  <title>星环协议：爱丽丝</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app" id="app">
+    <section class="game-shell" aria-label="星环协议游戏画面">
+      <canvas id="game" width="480" height="720"></canvas>
+
+      <div class="boot-curtain" id="bootCurtain" aria-hidden="true">
+        <i></i><i></i><span>ORBITAL LINK // INITIALIZED</span>
+      </div>
+
+      <div class="beat-flash" aria-hidden="true"></div>
+      <div class="beat-rail" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <header class="topbar" aria-live="polite">
+        <div class="brand-lockup">
+          <span class="brand-mark">AR</span>
+          <span class="brand-text"><b>星环协议</b><small>ALICE ORBIT PROTOCOL</small></span>
+        </div>
+        <div class="stage-readout" id="stageReadout">星区 00</div>
+        <div class="top-actions">
+          <button class="icon-btn" id="muteBtn" type="button" title="静音" aria-label="静音">♪</button>
+          <button class="icon-btn" id="pauseBtn" type="button" title="暂停" aria-label="暂停">Ⅱ</button>
+          <button class="icon-btn" id="fullBtn" type="button" title="全屏" aria-label="全屏">⛶</button>
+        </div>
+      </header>
+
+      <aside class="side-hud" aria-hidden="true">
+        <div class="hud-kicker"><i></i> BATTLE SYNC</div>
+        <div class="hud-block primary-stat"><span>SCORE</span><strong id="score">0000000</strong></div>
+        <div class="hud-row">
+          <div class="hud-block"><span>BEST</span><strong id="best">0000000</strong></div>
+          <div class="hud-block compact"><span>GRAZE</span><strong id="graze">0</strong></div>
+          <div class="hud-block compact"><span>DRIVE</span><strong id="chain">x1.0</strong></div>
+        </div>
+      </aside>
+
+      <div class="combo-display" id="comboDisplay" aria-hidden="true">
+        <small>SYNC</small><strong id="comboHits">0</strong><span>COMBO</span>
+      </div>
+
+      <div class="vitals" aria-hidden="true">
+        <div class="crew-mini" id="crewMini"><span>AL-00</span></div>
+        <div class="vital-data">
+          <div class="operator-line"><span>PLAYER</span><strong>爱丽丝</strong><em id="hpState">系统正常</em></div>
+          <div class="hp-readout"><span>耐久</span><strong><b id="playerHp">300</b> / <span id="playerMaxHp">300</span></strong></div>
+          <div class="hp-track" id="playerHpTrack"><i id="playerHpLag"></i><b id="playerHpFill"></b><span></span></div>
+          <div class="core-line"><span>武器充能</span><div id="bombPips" class="pips coral"></div><small>击破核心与擦弹补给</small></div>
+        </div>
+      </div>
+
+      <button class="burst-btn" id="bombBtn" type="button" title="轨道轰击 (X)" aria-label="轨道轰击"><span class="orbit-icon" aria-hidden="true"></span><b>ORBIT</b></button>
+
+      <button class="debug-tab" id="debugTab" type="button" title="调试设置" aria-label="打开调试设置">⚙</button>
+      <aside class="debug-drawer" id="debugDrawer" aria-label="调试设置">
+        <div class="debug-heading"><span>DEBUG</span><button id="debugClose" type="button" title="关闭" aria-label="关闭调试设置">×</button></div>
+        <label class="toggle-row" for="invincibleToggle">
+          <span><b>无敌模式</b><small id="debugStatus">受到攻击时仅闪烁</small></span>
+          <input id="invincibleToggle" type="checkbox">
+          <i aria-hidden="true"></i>
+        </label>
+      </aside>
+
+      <section class="screen start-screen" id="startScreen">
+        <nav class="title-nav" aria-label="标题导航">
+          <button type="button" class="active" data-hub="home">主页</button>
+          <button type="button" data-hub="about">介绍</button>
+          <button type="button" data-hub="ranking">排名</button>
+          <button type="button" data-hub="settings">设置</button>
+          <a class="workshop-link" href="/editor.html">工坊</a>
+          <button type="button" class="home-mail-btn" id="homeMailBtn" title="邮件与公告" aria-label="邮件与公告">✉<i id="homeMailDot"></i></button>
+          <button type="button" class="profile-chip" id="profileChip" title="修改玩家资料"><span>AL</span><b id="profileName">未登录</b></button>
+        </nav>
+        <div class="start-character" aria-hidden="true"></div>
+        <div class="world-medallion" aria-hidden="true"><span>WORLD</span><b>01</b></div>
+        <div class="title-art">
+          <p class="eyebrow">PIXEL BARRAGE / PLANETARY RHYTHM</p>
+          <h1>星环<br>协议</h1>
+          <p class="subtitle">爱丽丝 <span>ORBIT PROTOCOL</span></p>
+        </div>
+        <div class="start-controls">
+          <div class="briefing-line"><span>ALICE-00</span><strong>星图同步 · 武器待命</strong><em>READY</em></div>
+          <div class="route-hint"><span>ROUTE SELECT</span><b>在星图中选择星系与守卫</b></div>
+          <button class="primary-btn" id="startBtn" type="button"><span>▶</span> 启动星图</button>
+        </div>
+        <div class="start-index" aria-hidden="true">07</div>
+
+        <section class="hub-panel hidden" id="aboutPanel" aria-label="游戏介绍">
+          <div class="panel-kicker">MISSION ARCHIVE</div>
+          <h2>穿越星环，解除守卫污染</h2>
+          <p>爱丽丝在异常跃迁后抵达未知星区。八台轨道机械守卫因保护协议受污染而封锁行星，你需要击破污染核心，恢复星门航路。</p>
+          <div class="guide-grid">
+            <article><b>移动与射击</b><span>WASD / 方向键移动，按住 Z、K 或空格进行三向射击。</span></article>
+            <article><b>低速与擦弹</b><span>按住 Shift 精细移动；贴近弹幕擦过可提升同步倍率并补给技能。</span></article>
+            <article><b>轨道轰击</b><span>按 X 消耗一格核心，锁定守卫并发射贯穿激光，同时清理危险弹幕。</span></article>
+            <article><b>节奏窗口</b><span>弹幕按节拍形成队列、魔法阵和激光间歇，观察预警后穿过安全区。</span></article>
+          </div>
+          <section class="creator-card" aria-label="作者与联系方式">
+            <div class="creator-mark creator-avatar" aria-hidden="true"><img src="assets/alice-comms-v1.png" alt=""></div>
+            <div><span>CREATOR // NEKO LINK</span><h3>作者：芙桃</h3><p>独立设计、程序与关卡演出。欢迎反馈弹幕节奏、视觉表现与设备适配问题，感谢参与星环测试喵。</p></div>
+            <a href="mailto:tyy_5201314@foxmail.com">tyy_5201314@foxmail.com</a>
+          </section>
+          <footer class="about-legal"><span>LEGAL // PLAYER PRIVACY</span><p>我们仅处理运行游戏、排行榜与工坊所需的信息。查看数据范围、删除方式、创作者内容责任及健康提示。</p><a href="/privacy.html" target="_blank" rel="noopener">隐私政策与用户协议 →</a></footer>
+        </section>
+
+        <section class="hub-panel hidden" id="rankingPanel" aria-label="排行榜">
+          <div class="panel-head"><div><div class="panel-kicker">ORBIT RECORDS</div><h2>星环排名</h2></div><button type="button" id="refreshRanking" title="刷新排名" aria-label="刷新排名">↻</button></div>
+          <label class="ranking-filter"><span>星系</span><select id="rankingGalaxy"><option value="all">全部星系</option><option value="atlas">赤曜 · ATLAS</option><option value="lumen">紫辉 · LUMEN</option><option value="vesper">粉晶 · VESPER</option><option value="null">金寂 · NULL</option><option value="aether">苍穹 · AETHER</option><option value="mirage">幻潮 · MIRAGE</option><option value="umbra">蚀影 · UMBRA</option><option value="zenith">天极 · ZENITH</option></select></label>
+          <div class="ranking-status" id="rankingStatus">正在连接排名服务...</div>
+          <ol class="ranking-list" id="rankingList"></ol>
+          <p class="privacy-note">仅展示选择公开排名的玩家；隐藏排名仍会保留本机最高分。</p>
+        </section>
+
+        <section class="hub-panel hidden" id="settingsPanel" aria-label="游戏设置">
+          <div class="panel-kicker">SYSTEM CONFIG</div>
+          <h2>作战设置</h2>
+          <label class="setting-row"><span><b>总音量</b><small>控制全部声音</small></span><input id="masterVolume" type="range" min="0" max="100" value="82"><output id="masterVolumeValue">82</output></label>
+          <label class="setting-row"><span><b>音乐音量</b><small>标题与战斗音乐</small></span><input id="musicVolume" type="range" min="0" max="100" value="55"><output id="musicVolumeValue">55</output></label>
+          <label class="setting-row"><span><b>音效音量</b><small>射击、擦弹与激光</small></span><input id="sfxVolume" type="range" min="0" max="100" value="86"><output id="sfxVolumeValue">86</output></label>
+          <label class="switch-row"><span><b>画面震动</b><small>打击与激光冲击</small></span><input id="shakeToggle" type="checkbox" checked><i></i></label>
+          <label class="switch-row"><span><b>节拍闪光</b><small>随音乐节拍反馈</small></span><input id="beatToggle" type="checkbox" checked><i></i></label>
+          <label class="switch-row"><span><b>公开排名</b><small>允许昵称出现在排行榜</small></span><input id="shareRankingToggle" type="checkbox" checked><i></i></label>
+        </section>
+
+        <section class="home-mail-panel hidden" id="homeMailPanel" aria-label="邮件与公告">
+          <header><div><span>ORBIT INBOX</span><h2>邮件与公告</h2></div><button type="button" id="homeMailClose" aria-label="关闭邮件">×</button></header>
+          <div class="home-mail-list" id="homeMailList"><p>正在同步星环消息...</p></div>
+          <footer id="homeMailAccount">公开公告频道</footer>
+        </section>
+      </section>
+
+      <section class="screen galaxy-screen hidden overview" id="galaxyScreen" aria-label="星系选择">
+        <div class="galaxy-topline"><button type="button" id="galaxyBack" aria-label="返回主页">←</button><div><span>STAR CHART // FREE NAVIGATION</span><b id="galaxyModeTitle">拖动星图并选择目标</b></div><em id="galaxyIndex">08 SYSTEMS</em></div>
+        <div class="galaxy-stage" id="galaxyStage">
+          <div class="galaxy-camera" id="galaxyCamera">
+            <canvas class="star-map-canvas" id="starMapCanvas" width="3400" height="2200" aria-hidden="true"></canvas>
+            <div class="galaxy-world" id="galaxyTrack" role="listbox" aria-label="可选星系">
+              <button type="button" class="galaxy-node" data-galaxy="0" data-x="900" data-y="1100" style="--gx:900px;--gy:1100px" role="option" aria-selected="false"><i class="planet planet-atlas"></i><span>赤曜</span><small>ATLAS // 01</small></button>
+              <button type="button" class="galaxy-node" data-galaxy="1" data-x="1250" data-y="700" style="--gx:1250px;--gy:700px" role="option" aria-selected="false"><i class="planet planet-lumen"></i><span>紫辉</span><small>LUMEN // 02</small></button>
+              <button type="button" class="galaxy-node" data-galaxy="2" data-x="1600" data-y="1050" style="--gx:1600px;--gy:1050px" role="option" aria-selected="false"><i class="planet planet-vesper"></i><span>粉晶</span><small>VESPER // 03</small></button>
+              <button type="button" class="galaxy-node" data-galaxy="3" data-x="2050" data-y="680" style="--gx:2050px;--gy:680px" role="option" aria-selected="false"><i class="planet planet-null"></i><span>金寂</span><small>NULL // 04</small></button>
+              <button type="button" class="galaxy-node" data-galaxy="4" data-x="1150" data-y="1500" style="--gx:1150px;--gy:1500px" role="option" aria-selected="false"><i class="planet planet-aether"></i><span>苍穹</span><small>AETHER // 05</small></button>
+              <button type="button" class="galaxy-node" data-galaxy="5" data-x="1650" data-y="1450" style="--gx:1650px;--gy:1450px" role="option" aria-selected="false"><i class="planet planet-mirage"></i><span>幻潮</span><small>MIRAGE // 06</small></button>
+              <button type="button" class="galaxy-node" data-galaxy="6" data-x="2100" data-y="1420" style="--gx:2100px;--gy:1420px" role="option" aria-selected="false"><i class="planet planet-umbra"></i><span>蚀影</span><small>UMBRA // 07</small></button>
+              <button type="button" class="galaxy-node" data-galaxy="7" data-x="2500" data-y="1080" style="--gx:2500px;--gy:1080px" role="option" aria-selected="false"><i class="planet planet-zenith"></i><span>天极</span><small>ZENITH // 08</small></button>
+            </div>
+          </div>
+          <div class="chart-controls" aria-hidden="true"><span>DRAG</span><b>拖动探索</b><i></i><span>SELECT</span><b>选择并靠近</b></div>
+          <button class="galaxy-arrow previous" id="galaxyPrev" type="button" title="上一个星系" aria-label="上一个星系">‹</button>
+          <button class="galaxy-arrow next" id="galaxyNext" type="button" title="下一个星系" aria-label="下一个星系">›</button>
+        </div>
+        <aside class="galaxy-info hidden" id="galaxyInfo">
+          <button class="galaxy-info-close" id="galaxyInfoClose" type="button" aria-label="返回星图总览">×</button>
+          <span class="threat" id="galaxyThreat">危险等级 Ⅰ</span>
+          <h2 id="galaxyName">赤曜近地星系</h2>
+          <p id="galaxyDesc">节奏清晰的环形弹幕与单线激光，适合首次巡航。</p>
+          <dl><div><dt>守卫类型</dt><dd id="galaxyGuardian">ATLAS-G1 / 轨道哨卫</dd></div><div><dt>作战节奏</dt><dd id="galaxyRhythm">舒缓 · 预警充分</dd></div><div><dt>排行记录</dt><dd id="galaxyRecord">等待同步</dd></div></dl>
+          <button class="primary-btn" id="deployBtn" type="button"><span>▶</span> 跃迁至目标星系</button>
+        </aside>
+        <div class="warp-caption hidden" id="warpCaption"><i></i><span>HYPERDRIVE LOCKED</span><b>折跃航道正在建立</b><small id="warpTarget">TARGET // UNKNOWN</small></div>
+      </section>
+
+      <section class="dialogue-layer hidden" id="dialogueLayer" aria-live="polite">
+        <div class="dialogue-portrait left" id="dialogueLeft"></div>
+        <div class="dialogue-portrait right" id="dialogueRight"></div>
+        <button class="dialogue-box" id="dialogueBox" type="button" aria-label="继续剧情">
+          <span class="dialogue-name" id="dialogueName"></span>
+          <span class="dialogue-text" id="dialogueText"></span>
+          <span class="dialogue-next">▼</span>
+        </button>
+      </section>
+
+      <div class="core-toast hidden" id="coreToast" aria-live="polite">
+        <span>充能入库</span><strong>+1</strong><small id="coreReason">行星核心补给</small>
+      </div>
+
+      <section class="screen pause-screen hidden" id="pauseScreen">
+        <p class="eyebrow">BATTLE HOLD</p>
+        <h2>作战暂停</h2>
+        <div class="dialog-actions">
+          <button class="primary-btn" id="resumeBtn" type="button"><span>▶</span> 继续</button>
+          <button class="secondary-btn" id="restartBtn" type="button">↻ 重开本局</button>
+          <button class="text-btn" id="titleBtn" type="button">返回标题</button>
+        </div>
+      </section>
+
+      <section class="screen result-screen hidden" id="resultScreen">
+        <p class="eyebrow" id="resultEyebrow">ORBIT COMPLETE</p>
+        <h2 id="resultTitle">轨道已净化</h2>
+        <div class="result-grid">
+          <div class="result-total"><span>综合评分</span><strong id="finalScore">0</strong><em id="finalGrade">A</em></div>
+          <div><span>剩余耐久</span><strong id="finalHp">300 / 300</strong></div>
+          <div><span>擦弹次数</span><strong id="finalGraze">0</strong></div>
+          <div><span>最高连击</span><strong id="finalChain">0 HIT</strong></div>
+          <div><span>符卡击破</span><strong id="finalCaptures">0 / 3</strong></div>
+        </div>
+        <aside class="result-comment" id="resultCommentBox" aria-live="polite">
+          <span>ALICE // AFTER ACTION</span>
+          <p id="resultComment">勉强算你通过啦，下次可别让我等太久哦~</p>
+        </aside>
+        <p class="result-ranking-state" id="resultRankingState">成绩可提交公开排名</p>
+        <div class="dialog-actions">
+          <button class="primary-btn" id="againBtn" type="button"><span>↻</span> 再次出击</button>
+          <button class="text-btn" id="resultTitleBtn" type="button">返回标题</button>
+        </div>
+      </section>
+
+      <aside class="tease-toast hidden" id="teaseToast" role="status" aria-live="polite">
+        <div><span>DEBUG // ALICE NOTICE</span><button id="teaseClose" type="button" aria-label="关闭提示">×</button></div>
+        <p id="teaseText"></p>
+      </aside>
+
+      <section class="profile-gate hidden" id="profileGate" aria-label="玩家资料">
+        <form class="profile-dialog" id="profileForm">
+          <div class="panel-kicker">PILOT REGISTRATION</div>
+          <h2>输入作战昵称</h2>
+          <p>昵称用于保存本机进度与提交排行榜，之后可在标题页右上角修改。</p>
+          <label><span>玩家昵称</span><input id="playerNameInput" type="text" minlength="2" maxlength="14" autocomplete="nickname" placeholder="2-14 个字符" required></label>
+          <label class="switch-row profile-share"><span><b>公开排名</b><small>关闭后不会上传排行榜</small></span><input id="profileShare" type="checkbox" checked><i></i></label>
+          <label class="privacy-consent"><input id="privacyConsent" type="checkbox" required><span>我已阅读并同意 <a href="/privacy.html#privacy" target="_blank" rel="noopener">《隐私政策与用户协议》</a>，知悉排行榜公开规则、数据保存方式与健康提示。</span></label>
+          <p class="form-error hidden" id="profileError" role="alert"></p>
+          <button class="primary-btn" type="submit"><span>▶</span> 进入星环协议</button>
+          <button class="text-btn" id="profileReset" type="button">清除本机玩家资料</button>
+        </form>
+      </section>
+    </section>
+  </main>
+  <script>
+    window.__bootErrors = [];
+    window.addEventListener('error', (event) => window.__bootErrors.push({
+      message: event.message,
+      file: event.filename,
+      line: event.lineno,
+      column: event.colno,
+    }));
+  </script>
+  <script src="game.js"></script>
+</body>
+</html>
